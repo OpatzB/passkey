@@ -6,7 +6,15 @@ import { migrateDb } from "./migrateDb";
 
 describe("DB handler", () => {
   const db = migrateDb(createDb(":memory:"));
-  const { getUserById, prepareUserRegistration } = dbHandlerBuilder(db);
+  const { getUserById, insertUser, getRegistrationStatusByEmail } =
+    dbHandlerBuilder(db);
+
+  const testUser = {
+    id: "1",
+    email: "Jim@Jim.Jim",
+    passkeyOptionsJson: "mockJson",
+    registrationStatus: "IN_PROGRESS",
+  } as const;
 
   afterAll(() => {
     db.close();
@@ -23,16 +31,17 @@ describe("DB handler", () => {
     }
   });
 
-  it("write and read user", async () => {
-    const testUser = {
-      id: "1",
-      email: "Jim@Jim.Jim",
-      passkeyOptionsJson: "mockJson",
-    };
-
-    prepareUserRegistration(testUser);
+  it("getUserById", async () => {
+    insertUser(testUser);
     const res = getUserById(testUser.id);
 
     expect(res).toEqual(testUser);
+  });
+
+  it("getRegistrationStatusByEmail", async () => {
+    insertUser(testUser);
+    const res = getRegistrationStatusByEmail(testUser.email);
+
+    expect(res).toEqual(testUser.registrationStatus);
   });
 });

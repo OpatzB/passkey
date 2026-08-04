@@ -4,6 +4,11 @@ export const userSchema = z.object({
   id: z.string(),
   email: z.string(),
   passkeyOptionsJson: z.optional(z.string()),
+  registrationStatus: z.optional(
+    z
+      .literal("IN_PROGRESS")
+      .or(z.literal("COMPLETE").or(z.literal("NON_EXISTING"))),
+  ),
 });
 
 export type User = z.infer<typeof userSchema>;

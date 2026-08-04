@@ -2,7 +2,7 @@ import z from "zod";
 import "./App.css";
 import { useQuery } from "@tanstack/react-query";
 import { globals } from "./globals.ts";
-import type { User } from "./server/zod.ts";
+import { userSchema, type User } from "./server/zod.ts";
 
 export function App() {
   const { data, isLoading } = useGetHelloWorld();
@@ -41,7 +41,7 @@ function useGetRegistrationOtions(email: User["email"]) {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      return data;
+      return userSchema.parse(data);
     },
   });
 }
