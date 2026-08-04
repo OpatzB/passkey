@@ -10,6 +10,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
       throwOnError: (error) => {
         if (isNetworkError(error)) {
           console.log("Network error: ", error);

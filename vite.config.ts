@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), babel({ presets: [reactCompilerPreset()] })],
+    define: {
+      "process.env.VITE_PORT": JSON.stringify(env.VITE_PORT),
+    },
     server: {
       port: Number(env.VITE_PORT),
       proxy: {

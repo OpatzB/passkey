@@ -3,11 +3,10 @@ import { afterAll, aroundEach, describe, expect, it } from "vitest";
 import { createDb } from "./createDb";
 import { dbHandlerBuilder } from "./dbHandler";
 import { migrateDb } from "./migrateDb";
-import type { User } from "./zod";
 
 describe("DB handler", () => {
   const db = migrateDb(createDb(":memory:"));
-  const { getUserById, addUser } = dbHandlerBuilder(db);
+  const { getUserById, prepareUserRegistration } = dbHandlerBuilder(db);
 
   afterAll(() => {
     db.close();
@@ -25,9 +24,13 @@ describe("DB handler", () => {
   });
 
   it("write and read user", async () => {
-    const testUser: User = { id: 1, name: "Jim" };
+    const testUser = {
+      id: "1",
+      email: "Jim@Jim.Jim",
+      passkeyOptionsJson: "mockJson",
+    };
 
-    addUser(testUser);
+    prepareUserRegistration(testUser);
     const res = getUserById(testUser.id);
 
     expect(res).toEqual(testUser);
