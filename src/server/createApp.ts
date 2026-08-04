@@ -44,7 +44,7 @@ export function createApp() {
     return res.json(user);
   });
 
-  app.post("api/register/verify", async (req, res) => {
+  app.post("/api/register/verify", async (req, res) => {
     // TODO this should probably come from an HTTP-Only Token or sth. like that
     const { data, error: payloadError } = z
       .object({ userId: z.string() })
@@ -76,7 +76,7 @@ export function createApp() {
     return res.status(201).send(verification);
   });
 
-  app.get("api/register/status", async (req, res) => {
+  app.post("/api/register/status", async (req, res) => {
     // TODO this should probably come from an HTTP-Only Token or sth. like that
     const { data, error } = z.object({ email: z.string() }).safeParse(req.body);
     if (error) return res.status(400).json(error);

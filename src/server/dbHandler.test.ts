@@ -44,4 +44,11 @@ describe("DB handler", () => {
 
     expect(res).toEqual(testUser.registrationStatus);
   });
+
+  it("getRegistrationStatusByEmail - find no user", async () => {
+    // insertUser(testUser);
+    const res = getRegistrationStatusByEmail(testUser.email);
+
+    expect(res).toEqual("NON_EXISTING");
+  });
 });

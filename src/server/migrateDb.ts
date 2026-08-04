@@ -4,7 +4,7 @@ const migrations = [
   `
     CREATE TABLE user (
       id TEXT PRIMARY KEY,
-      email TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
       passkeyOptionsJson TEXT,
       registrationStatus TEXT
     );

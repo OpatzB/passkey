@@ -1,5 +1,6 @@
 import type { Database } from "better-sqlite3";
 import { userSchema, type User } from "./zod.ts";
+import z from "zod";
 
 export function dbHandlerBuilder(db: Database) {
   return {
@@ -11,7 +12,10 @@ export function dbHandlerBuilder(db: Database) {
     getRegistrationStatusByEmail: (email: User["email"]) => {
       const query = db.prepare("SELECT * FROM user WHERE email = ?");
       const user = query.get(email);
-      return userSchema.parse(user).registrationStatus ?? "NON_EXISTING";
+      return (
+        userSchema.or(z.undefined()).parse(user)?.registrationStatus ??
+        "NON_EXISTING"
+      );
     },
     insertUser: (user: Required<User>) => {
       const query = db.prepare(

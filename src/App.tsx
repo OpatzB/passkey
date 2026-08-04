@@ -1,47 +1,52 @@
-import z from "zod";
-import "./App.css";
-import { useQuery } from "@tanstack/react-query";
-import { globals } from "./globals.ts";
-import { userSchema, type User } from "./server/zod.ts";
+import { useGetRegistrationStatus } from "./hooks/useGetRegistrationStatus.ts";
+import { useGetRegistrationOptions } from "./hooks/useGetRegistrationOptions.ts";
+import { useState } from "react";
+import { useDebounce } from "./hooks/useDebounce.ts";
 
 export function App() {
-  const { data, isLoading } = useGetHelloWorld();
-  useGetRegistrationOtions("foo@bar.com");
+  const [email, setEmail] = useState("");
+  const debouncedEmail = useDebounce(email, 1000);
 
-  return isLoading ? "loading..." : data?.hello;
+  const { data: registrationStatus } = useGetRegistrationStatus(debouncedEmail);
+  console.log("registrationStatus", registrationStatus);
+  return (
+    <div>
+      {(registrationStatus === "NON_EXISTING" || !registrationStatus) && (
+        <RegisterMenu email={email} setEmail={setEmail} />
+      )}
+      {registrationStatus === "IN_PROGRESS" && "Registration in progress ..."}
+      {registrationStatus === "COMPLETE" && "You are now registered!"}
+    </div>
+  );
 }
 
-function useGetHelloWorld() {
-  return useQuery({
-    queryKey: ["helloworld"],
-    queryFn: async () => {
-      const response = await fetch(`${globals.apiUrl}/helloworld`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
+function RegisterMenu(props: {
+  email: string;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+}) {
+  const getRegistrationOptions = useGetRegistrationOptions();
 
-      return z.object({ hello: z.string() }).parse(data);
-    },
-  });
-}
+  const { data: registrationStatus } = useGetRegistrationStatus(props.email);
 
-function useGetRegistrationOtions(email: User["email"]) {
-  return useQuery({
-    queryKey: ["register", "options"],
-    queryFn: async () => {
-      const response = await fetch(`${globals.apiUrl}/register/options`, {
-        method: "POST",
-        body: JSON.stringify({ email }),
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      return userSchema.parse(data);
-    },
-  });
+  const onRegister = async () => {
+    if (
+      (registrationStatus === "NON_EXISTING" || !registrationStatus) &&
+      props.email
+    ) {
+      await getRegistrationOptions.mutateAsync(props.email);
+    }
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="email"
+        onChange={(e) => props.setEmail(e.target.value)}
+      />
+      <button type="button" onClick={onRegister}>
+        Register
+      </button>
+    </div>
+  );
 }
