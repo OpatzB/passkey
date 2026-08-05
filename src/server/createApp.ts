@@ -71,6 +71,7 @@ export function createApp() {
       console.error(error);
       return res.status(400).send({ error });
     }
+    dbHandler.updateUserById({ id: user.id, registrationStatus: "COMPLETE" });
 
     // TODO mark user as registrationStatus = complete
 

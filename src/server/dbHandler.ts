@@ -23,5 +23,13 @@ export function dbHandlerBuilder(db: Database) {
       );
       return query.run(user);
     },
+    updateUserById: (
+      user: Required<Pick<User, "id" | "registrationStatus">>,
+    ) => {
+      const query = db.prepare(
+        "UPDATE user SET registrationStatus = ? WHERE id = ?",
+      );
+      return query.run(user.registrationStatus, user.id);
+    },
   } as const;
 }

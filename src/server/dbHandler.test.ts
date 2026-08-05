@@ -6,8 +6,12 @@ import { migrateDb } from "./migrateDb";
 
 describe("DB handler", () => {
   const db = migrateDb(createDb(":memory:"));
-  const { getUserById, insertUser, getRegistrationStatusByEmail } =
-    dbHandlerBuilder(db);
+  const {
+    getUserById,
+    insertUser,
+    updateUserById,
+    getRegistrationStatusByEmail,
+  } = dbHandlerBuilder(db);
 
   const testUser = {
     id: "1",
@@ -50,5 +54,16 @@ describe("DB handler", () => {
     const res = getRegistrationStatusByEmail(testUser.email);
 
     expect(res).toEqual("NON_EXISTING");
+  });
+
+  it("updateUserById", async () => {
+    insertUser(testUser);
+    updateUserById({
+      id: testUser.id,
+      registrationStatus: "COMPLETE",
+    });
+    const res = getUserById(testUser.id);
+
+    expect(res.registrationStatus).toEqual("COMPLETE");
   });
 });
