@@ -1,8 +1,8 @@
 import z from "zod";
 
 const port = z.string().parse(process.env.VITE_PORT);
-const domain = `localhost:${port}`;
-const baseUrl = `http://${domain}`;
+const domain = "localhost";
+const baseUrl = `http://${domain}:${port}`;
 const apiUrl = `${baseUrl}/api`;
 
 export const globals = {

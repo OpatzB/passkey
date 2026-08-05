@@ -19,9 +19,8 @@ export function useGetRegistrationOptions() {
       const data = await response.json();
       return userSchema.parse(data);
     },
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       queryClient.invalidateQueries({ queryKey: ["register", "status"] });
-      console.log("onSuccress: ", res);
     },
   });
 }

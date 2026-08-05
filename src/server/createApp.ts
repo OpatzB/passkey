@@ -8,6 +8,7 @@ import { existsSync, unlinkSync } from "fs";
 import { migrateDb } from "./migrateDb.ts";
 import {
   verifyRegistrationResponse,
+  type RegistrationResponseJSON,
   type VerifiedRegistrationResponse,
 } from "@simplewebauthn/server";
 import { relyingParty } from "./relyingParty.ts";
@@ -47,7 +48,7 @@ export function createApp() {
   app.post("/api/register/verify", async (req, res) => {
     // TODO this should probably come from an HTTP-Only Token or sth. like that
     const { data, error: payloadError } = z
-      .object({ userId: z.string() })
+      .object({ userId: z.string(), authenticatorResponse: z.unknown() })
       .safeParse(req.body);
     if (payloadError) return res.status(400).json(payloadError);
 
@@ -61,7 +62,7 @@ export function createApp() {
     let verification: VerifiedRegistrationResponse;
     try {
       verification = await verifyRegistrationResponse({
-        response: req.body, // return value of @simplewebauthn/browser/startRegistration()
+        response: data.authenticatorResponse as RegistrationResponseJSON, // return value of @simplewebauthn/browser/startRegistration()
         expectedChallenge: challenge,
         expectedOrigin: relyingParty.origin,
         expectedRPID: relyingParty.id,
